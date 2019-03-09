@@ -56,43 +56,25 @@ public:
 
 	public:
 		reference operator*() {
-			// Replace the line(s) below with your code.
-			///
-
-			///
-			return parent->buffer[0];
+			return parent->buffer[(this->parent.begin_index + this->offset) % MAX_SIZE];
 		}
 
 		iterator& operator++() {
-			// Replace the line(s) below with your code.
-			///
-
-			///
+			--(this->offset);
 			return *this;
 		}
 
 		iterator operator++(int unused) {
-			// Replace the line(s) below with your code.
-			///
-
-			///
+			--(this->offset);
 			return *this;
 		}
 
 		bool operator==(const iterator& rhs) const {
-			// Replace the line(s) below with your code.
-			///
-
-			///
-			return true;
+			return ((this->parent == rhs.parent) && (this->offset == rhs.offset));
 		}
 
 		bool operator!=(const iterator& rhs) const {
-			// Replace the line(s) below with your code.
-			///
-
-			///
-			return true;
+			return (!(*this == rhs));
 		}
 
 	}; // end of iterator class
@@ -130,12 +112,11 @@ private:
 	// RingQueue
 	ItemType buffer[MAX_SIZE];
 
-	// The starting index.
+	// The starting index; should always be between 0 and MAX_SIZE - 1, and specifically between 0 and ring_size - 1.
 	int begin_index;
 
 	// The number of elements in the RingQueue.
 	int ring_size;
-
 
 
 	// A helper function that computes the index of 'the end' of the RingQueue
@@ -156,7 +137,7 @@ public:
 			try {
 				return ItemType();
 			}
-			catch () {
+			catch (...) {
 				std::cout << "No default ctor for specified item type!";
 				return NULL;
 			}
@@ -170,7 +151,7 @@ public:
 			try {
 				return ItemType();
 			}
-			catch () {
+			catch (...) {
 				std::cout << "No default ctor for specified item type!";
 				return NULL;
 			}
@@ -182,28 +163,30 @@ public:
 
 	// Mutators
 	void push_back(const ItemType& value) {
-		this->buffer[this->end_index()] = 
+		this->buffer[this->end_index()] = value;
+		if (this->ring_size < MAX_SIZE) ++(this->ring_size);
+		else this->begin_index = (this->begin_index + 1) % MAX_SIZE;
 		return;
 	}
 
 	void pop_front() {
-		++(this->begin_index);
-		--(this->ring_size);
+		if (this->ring_size) {
+			this->begin_index = (this->begin_index + 1) % MAX_SIZE;
+			--(this->ring_size);
+		}
 		return;
 	}
 
 
 	// Functions that return iterators
 	iterator begin() {
-		return iterator(this, this->begin_index);
+		//Starting at the beginning of the queue, the offset from the beginning will be zero.
+		return iterator(this, 0);
 	}
 
 	iterator end() {
-		// Replace the line(s) below with your code.
-		///
-		
-		///
-		return iterator(this, 0);
+		//At the end of the queue, the offset will be how many elements were in the queue.
+		return iterator(this, this->ring_size);
 	}
 
 
