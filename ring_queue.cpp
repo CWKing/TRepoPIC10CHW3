@@ -45,8 +45,7 @@ public:
 		int offset;
 
 	private:
-		iterator(RingQueue* _parent, int _offset = 0)
-			: parent(_parent), offset(_offset) { }
+		iterator(RingQueue* _parent, int _offset = 0) : parent(_parent), offset(_offset) {}
 
 
 		// It is quite common for Containers and their iterators to be friends.
@@ -56,16 +55,16 @@ public:
 
 	public:
 		reference operator*() {
-			return parent->buffer[(this->parent.begin_index + this->offset) % MAX_SIZE];
+			return parent->buffer[(this->parent->begin_index + this->offset) % MAX_SIZE];
 		}
 
 		iterator& operator++() {
-			--(this->offset);
+			++(this->offset);
 			return *this;
 		}
 
 		iterator operator++(int unused) {
-			--(this->offset);
+			++(this->offset);
 			return *this;
 		}
 
@@ -128,7 +127,13 @@ private:
 
 public:
 	// Constructor
-	RingQueue() : begin_index(0), ring_size(0) { }
+	RingQueue() : begin_index(0), ring_size(0) {
+		//Initialize with default ctors of template type
+		try {
+			for (int i = 0; i < MAX_SIZE; ++i) this->buffer[i] = ItemType();
+		}
+		catch (...) {/*Do nothing if our attempt to initilize failed*/}
+	}
 
 	// Accessors. Note: 'back()' is not considered part of the array.
 	ItemType front() const {
@@ -192,11 +197,7 @@ public:
 
 	// Miscellaneous functions
 	size_t size() const {
-		// Replace the line(s) below with your code.
-		///
-
-		///
-		return 0;
+		return this->ring_size;
 	}
 
 	// Debugging functions
@@ -234,17 +235,11 @@ int main() {
 	std::cout << '\n';
 
 
-
-	// Uncomment the block below only when you have a working implementation of
-	// RingQueue<ItemType,int>::end().  If the implementation is not correct, it
-	// might result in an infinite loop.
-	/**
 	std::cout << "Queue via iterators:\n";
 	for ( auto it = rq.begin() ; it != rq.end() ; ++it ) {
 		std::cout << "Value: " << *it << ", address: " << &(*it) << '\n';
 	}
 	std::cout << '\n';
-	*/
 
 
 
